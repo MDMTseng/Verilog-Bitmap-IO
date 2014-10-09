@@ -15,18 +15,13 @@ wire [23:0] OutPixel_L;
 
 
 wire [23:0]mixPixel=(y[0]==1)?
-     (OutPixel_L):(OutPixel_R);//mix the row data
+(OutPixel_L):(OutPixel_R);//mix the row data
 
 wire [23:0] KK1;
 readBMPStream rS_R(file1_R,pixClk,rst,reload,bmp_header,ReadEnd,OutPixel_R,x,y);
 readBMPStream rS_L(file1_L,pixClk,rst,reload,bmp_header2,ReadEnd2,OutPixel_L,xL,yL);
 writeBMPStream wS(.fileHandle(file2W),.clk(pixClk),.rst(wsrst),.reload(0),.bmp_refheader(bmp_header),.writeEnd(writeEnd),.InPixel(mixPixel));
 
-
-always
-begin
-    #10 pixClk=~pixClk;
-end
 ///////////////////////////Important don't change it, unless you know what are you doing.
 initial begin
     $dumpfile("wave.vcd");$dumpvars;
@@ -40,7 +35,15 @@ initial begin
      rst=0;
     reload=0;
 end
+
+
+always
+begin
+    #10 pixClk=~pixClk;
+end
 always@(posedge pixClk)wsrst=rst;
+
+
 always@(writeEnd)if(writeEnd)
     begin
         $fclose(file1_R);
